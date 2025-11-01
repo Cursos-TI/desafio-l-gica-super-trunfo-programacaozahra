@@ -1,0 +1,254 @@
+#include <stdio.h>
+#include <string.h>
+
+// Estrutura para representar uma carta do Super Trunfo
+struct Carta {
+    char estado[3];
+    char codigo[10];
+    char cidade[50];
+    int populacao;
+    float area;
+    float pib;
+    int pontos_turisticos;
+    float densidade_populacional;
+    float pib_per_capita;
+};
+
+void calcular_metricas(struct Carta *carta) {
+    carta->densidade_populacional = carta->populacao / carta->area;
+    carta->pib_per_capita = carta->pib / carta->populacao;
+}
+
+// Função para exibir os dados de uma carta
+void exibir_carta(struct Carta c, int numero_carta) {
+    printf("\n=== CARTA %d ===\n", numero_carta);
+    printf("Estado: %s\n", c.estado);
+    printf("Código: %s\n", c.codigo);
+    printf("Cidade: %s\n", c.cidade);
+    printf("População: %d habitantes\n", c.populacao);
+    printf("Área: %.2f km²\n", c.area);
+    printf("PIB: R$ %.2f bilhões\n", c.pib);
+    printf("Pontos Turísticos: %d\n", c.pontos_turisticos);
+    printf("Densidade Populacional: %.2f hab/km²\n", c.densidade_populacional);
+    printf("PIB per capita: R$ %.2f\n", c.pib_per_capita);
+}
+
+// Função para exibir o menu de atributos
+void exibir_menu_atributos() {
+    printf("\n=== MENU DE ATRIBUTOS ===\n");
+    printf("1 - População\n");
+    printf("2 - Área\n");
+    printf("3 - PIB\n");
+    printf("4 - Pontos Turísticos\n");
+    printf("5 - Densidade Populacional\n");
+    printf("6 - PIB per capita\n");
+    printf("Escolha o atributo para comparação (1-6): ");
+}
+
+void comparar_cartas(struct Carta c1, struct Carta c2, int atributo) {
+    char nome_atributo[30];
+    float valor_c1, valor_c2;
+    
+    // Definir qual atributo será comparado
+    switch(atributo) {
+        case 1: // População
+            strcpy(nome_atributo, "População");
+            valor_c1 = c1.populacao;
+            valor_c2 = c2.populacao;
+            break;
+        case 2: // Área
+            strcpy(nome_atributo, "Área");
+            valor_c1 = c1.area;
+            valor_c2 = c2.area;
+            break;
+        case 3: // PIB
+            strcpy(nome_atributo, "PIB");
+            valor_c1 = c1.pib;
+            valor_c2 = c2.pib;
+            break;
+        case 4: // Pontos Turísticos
+            strcpy(nome_atributo, "Pontos Turísticos");
+            valor_c1 = c1.pontos_turisticos;
+            valor_c2 = c2.pontos_turisticos;
+            break;
+        case 5: // Densidade Populacional
+            strcpy(nome_atributo, "Densidade Populacional");
+            valor_c1 = c1.densidade_populacional;
+            valor_c2 = c2.densidade_populacional;
+            break;
+        case 6: // PIB per capita
+            strcpy(nome_atributo, "PIB per capita");
+            valor_c1 = c1.pib_per_capita;
+            valor_c2 = c2.pib_per_capita;
+            break;
+        default:
+            strcpy(nome_atributo, "População");
+            valor_c1 = c1.populacao;
+            valor_c2 = c2.populacao;
+    }
+    
+    printf("\n=== COMPARAÇÃO ===\n");
+    printf("Atributo: %s\n\n", nome_atributo);
+    
+    if (atributo == 1 || atributo == 4) { // Atributos inteiros
+        printf("%s (%s): %d\n", c1.cidade, c1.estado, (int)valor_c1);
+        printf("%s (%s): %d\n", c2.cidade, c2.estado, (int)valor_c2);
+    } else { // Atributos float
+        printf("%s (%s): %.2f\n", c1.cidade, c1.estado, valor_c1);
+        printf("%s (%s): %.2f\n", c2.cidade, c2.estado, valor_c2);
+    }
+    
+    printf("\n=== RESULTADO ===\n");
+    
+    if (atributo == 5) { 
+        // Densidade Populacional - menor valor vence
+        if (valor_c1 < valor_c2) {
+            printf(" CARTA 1 VENCEU! (%s)\n", c1.cidade);
+            printf("Motivo: Menor densidade populacional\n");
+        } else if (valor_c1 > valor_c2) {
+            printf(" CARTA 2 VENCEU! (%s)\n", c2.cidade);
+            printf("Motivo: Menor densidade populacional\n");
+        } else {
+            printf(" EMPATE!\n");
+            printf("Ambas têm mesma densidade: %.2f hab/km²\n", valor_c1);
+        }
+    } else {
+        // Demais atributos - maior valor vence
+        if (valor_c1 > valor_c2) {
+            printf(" CARTA 1 VENCEU! (%s)\n", c1.cidade);
+            printf("Motivo: Maior %s\n", nome_atributo);
+        } else if (valor_c1 < valor_c2) {
+            printf(" CARTA 2 VENCEU! (%s)\n", c2.cidade);
+            printf("Motivo: Maior %s\n", nome_atributo);
+        } else {
+            printf(" EMPATE!\n");
+            printf("Ambas têm mesmo valor de %s: ", nome_atributo);
+            if (atributo == 1 || atributo == 4) {
+                printf("%d\n", (int)valor_c1);
+            } else {
+                printf("%.2f\n", valor_c1);
+            }
+        }
+    }
+}
+
+void exibir_menu_principal() {
+    printf("\n=== SUPER TRUNFO - NÍVEL AVENTUREIRO ===\n");
+    printf("1 - Ver cartas disponíveis\n");
+    printf("2 - Comparar cartas\n");
+    printf("3 - Sair\n");
+    printf("Escolha uma opção (1-3): ");
+}
+
+int main() {
+    struct Carta carta1, carta2, carta3;
+    int opcao, atributo;
+    
+    // Carta 1: São Paulo
+    strcpy(carta1.estado, "SP");
+    strcpy(carta1.codigo, "SP001");
+    strcpy(carta1.cidade, "São Paulo");
+    carta1.populacao = 12300000;
+    carta1.area = 1521.11;
+    carta1.pib = 699.28;
+    carta1.pontos_turisticos = 150;
+    
+    // Carta 2: Rio de Janeiro
+    strcpy(carta2.estado, "RJ");
+    strcpy(carta2.codigo, "RJ001");
+    strcpy(carta2.cidade, "Rio de Janeiro");
+    carta2.populacao = 6748000;
+    carta2.area = 1200.25;
+    carta2.pib = 344.48;
+    carta2.pontos_turisticos = 200;
+    
+    // Carta 3: Minas Gerais
+    strcpy(carta3.estado, "MG");
+    strcpy(carta3.codigo, "MG001");
+    strcpy(carta3.cidade, "Belo Horizonte");
+    carta3.populacao = 2537000;
+    carta3.area = 331.40;
+    carta3.pib = 85.42;
+    carta3.pontos_turisticos = 80;
+    
+    // Calcular métricas para todas as cartas
+    calcular_metricas(&carta1);
+    calcular_metricas(&carta2);
+    calcular_metricas(&carta3);
+    
+    // MENU INTERATIVO COM SWITCH
+    do {
+        exibir_menu_principal();
+        scanf("%d", &opcao);
+        
+        switch(opcao) {
+            case 1: // Ver cartas disponíveis
+                printf("\n CARTAS DISPONÍVEIS:\n");
+                exibir_carta(carta1, 1);
+                exibir_carta(carta2, 2);
+                exibir_carta(carta3, 3);
+                break;
+                
+            case 2: // Comparar cartas
+                printf("\n COMPARAR CARTAS\n");
+                printf("Escolha as cartas para comparar:\n");
+                printf("1 - São Paulo (SP) vs Rio de Janeiro (RJ)\n");
+                printf("2 - São Paulo (SP) vs Belo Horizonte (MG)\n");
+                printf("3 - Rio de Janeiro (RJ) vs Belo Horizonte (MG)\n");
+                printf("Escolha (1-3): ");
+                
+                int escolha_cartas;
+                scanf("%d", &escolha_cartas);
+                
+                struct Carta c1, c2;
+                char nome_c1[30], nome_c2[30];
+                
+                if (escolha_cartas == 1) {
+                    c1 = carta1;
+                    c2 = carta2;
+                    strcpy(nome_c1, "São Paulo");
+                    strcpy(nome_c2, "Rio de Janeiro");
+                } else if (escolha_cartas == 2) {
+                    c1 = carta1;
+                    c2 = carta3;
+                    strcpy(nome_c1, "São Paulo");
+                    strcpy(nome_c2, "Belo Horizonte");
+                } else if (escolha_cartas == 3) {
+                    c1 = carta2;
+                    c2 = carta3;
+                    strcpy(nome_c1, "Rio de Janeiro");
+                    strcpy(nome_c2, "Belo Horizonte");
+                } else {
+                    printf(" Opção inválida! Voltando ao menu...\n");
+                    break;
+                }
+                
+                printf("\nComparando: %s vs %s\n", nome_c1, nome_c2);
+                
+                // Menu de atributos
+                exibir_menu_atributos();
+                scanf("%d", &atributo);
+                
+                
+                if (atributo < 1 || atributo > 6) {
+                    printf(" Atributo inválido! Usando População como padrão.\n");
+                    atributo = 1;
+                }
+                
+                // Realizar comparação
+                comparar_cartas(c1, c2, atributo);
+                break;
+                
+            case 3: // Sair
+                printf("\n Obrigado por jogar Super Trunfo!\n");
+                printf("Encerrando o programa...\n");
+                break;
+                
+            default:
+                printf("Opção inválida! Tente novamente.\n");
+        }
+        
+    } while (opcao != 3);
+    
+    return 0;
+}
