@@ -1,0 +1,169 @@
+#include <stdio.h>
+#include <string.h>
+
+// Estrutura para representar uma carta do Super Trunfo
+struct Carta {
+    char estado[3];
+    char codigo[10];
+    char cidade[50];
+    int populacao;
+    float area;
+    float pib;
+    int pontos_turisticos;
+    float densidade_populacional;
+    float pib_per_capita;
+};
+
+// Função para calcular densidade populacional e PIB per capita
+void calcular_metricas(struct Carta *carta) {
+    carta->densidade_populacional = carta->populacao / carta->area;
+    carta->pib_per_capita = carta->pib / carta->populacao;
+}
+
+// Função para exibir os dados de uma carta
+void exibir_carta(struct Carta c, int numero_carta) {
+    printf("\n=== CARTA %d ===\n", numero_carta);
+    printf("Estado: %s\n", c.estado);
+    printf("Código: %s\n", c.codigo);
+    printf("Cidade: %s\n", c.cidade);
+    printf("População: %d habitantes\n", c.populacao);
+    printf("Área: %.2f km²\n", c.area);
+    printf("PIB: R$ %.2f bilhões\n", c.pib);
+    printf("Pontos Turísticos: %d\n", c.pontos_turisticos);
+    printf("Densidade Populacional: %.2f hab/km²\n", c.densidade_populacional);
+    printf("PIB per capita: R$ %.2f\n", c.pib_per_capita);
+}
+
+int main() {
+    printf("=== SUPER TRUNFO - NÍVEL NOVATO ===\n");
+    printf("Comparação de Cartas com Um Atributo\n\n");
+    
+    
+    struct Carta carta1, carta2;
+    
+    // Carta 1: São Paulo
+    strcpy(carta1.estado, "SP");
+    strcpy(carta1.codigo, "SP001");
+    strcpy(carta1.cidade, "São Paulo");
+    carta1.populacao = 12300000;
+    carta1.area = 1521.11;
+    carta1.pib = 699.28;
+    carta1.pontos_turisticos = 150;
+    
+    // Carta 2: Rio de Janeiro
+    strcpy(carta2.estado, "RJ");
+    strcpy(carta2.codigo, "RJ001");
+    strcpy(carta2.cidade, "Rio de Janeiro");
+    carta2.populacao = 6748000;
+    carta2.area = 1200.25;
+    carta2.pib = 344.48;
+    carta2.pontos_turisticos = 200;
+    
+    
+    calcular_metricas(&carta1);
+    calcular_metricas(&carta2);
+    
+    
+    exibir_carta(carta1, 1);
+    exibir_carta(carta2, 2);
+    
+    printf("\n=== COMPARAÇÃO DE CARTAS ===\n");
+    
+    
+    // Atributos disponíveis: 
+    // 1 - População, 2 - Área, 3 - PIB, 4 - Densidade Populacional, 5 - PIB per capita
+    
+    int atributo_escolhido = 1; // População (pode mudar para testar outros atributos)
+    char nome_atributo[30];
+    float valor_carta1, valor_carta2;
+    
+    
+    switch(atributo_escolhido) {
+        case 1: // População
+            strcpy(nome_atributo, "População");
+            valor_carta1 = carta1.populacao;
+            valor_carta2 = carta2.populacao;
+            break;
+        case 2: // Área
+            strcpy(nome_atributo, "Área");
+            valor_carta1 = carta1.area;
+            valor_carta2 = carta2.area;
+            break;
+        case 3: // PIB
+            strcpy(nome_atributo, "PIB");
+            valor_carta1 = carta1.pib;
+            valor_carta2 = carta2.pib;
+            break;
+        case 4: // Densidade Populacional
+            strcpy(nome_atributo, "Densidade Populacional");
+            valor_carta1 = carta1.densidade_populacional;
+            valor_carta2 = carta2.densidade_populacional;
+            break;
+        case 5: // PIB per capita
+            strcpy(nome_atributo, "PIB per capita");
+            valor_carta1 = carta1.pib_per_capita;
+            valor_carta2 = carta2.pib_per_capita;
+            break;
+        default:
+            strcpy(nome_atributo, "População");
+            valor_carta1 = carta1.populacao;
+            valor_carta2 = carta2.populacao;
+    }
+    
+    printf("Atributo escolhido para comparação: %s\n\n", nome_atributo);
+    printf("Carta 1 - %s (%s): ", carta1.cidade, carta1.estado);
+    
+    
+    if (atributo_escolhido == 1) { // População
+        printf("%d habitantes\n", (int)valor_carta1);
+        printf("Carta 2 - %s (%s): %d habitantes\n", carta2.cidade, carta2.estado, (int)valor_carta2);
+    } else if (atributo_escolhido == 2 || atributo_escolhido == 3) { // Área ou PIB
+        printf("%.2f\n", valor_carta1);
+        printf("Carta 2 - %s (%s): %.2f\n", carta2.cidade, carta2.estado, valor_carta2);
+    } else { // Densidade ou PIB per capita
+        printf("%.2f\n", valor_carta1);
+        printf("Carta 2 - %s (%s): %.2f\n", carta2.cidade, carta2.estado, valor_carta2);
+    }
+    
+    printf("\n=== RESULTADO ===\n");
+    
+    
+    // Para Densidade Populacional, o menor valor vence
+    // Para os demais atributos, o maior valor vence
+    
+    if (atributo_escolhido == 4) { // Densidade Populacional
+        if (valor_carta1 < valor_carta2) {
+            printf("Carta 1 (%s) venceu!\n", carta1.cidade);
+            printf("Motivo: Menor densidade populacional (%.2f hab/km² vs %.2f hab/km²)\n", 
+                   valor_carta1, valor_carta2);
+        } else if (valor_carta1 > valor_carta2) {
+            printf("Carta 2 (%s) venceu!\n", carta2.cidade);
+            printf("Motivo: Menor densidade populacional (%.2f hab/km² vs %.2f hab/km²)\n", 
+                   valor_carta2, valor_carta1);
+        } else {
+            printf("Empate! Ambas as cartas têm a mesma densidade populacional: %.2f hab/km²\n", valor_carta1);
+        }
+    } else { // Demais atributos (maior valor vence)
+        if (valor_carta1 > valor_carta2) {
+            printf("Carta 1 (%s) venceu!\n", carta1.cidade);
+            printf("Motivo: Maior %s\n", nome_atributo);
+        } else if (valor_carta1 < valor_carta2) {
+            printf("Carta 2 (%s) venceu!\n", carta2.cidade);
+            printf("Motivo: Maior %s\n", nome_atributo);
+        } else {
+            printf("Empate! Ambas as cartas têm o mesmo valor de %s: ", nome_atributo);
+            if (atributo_escolhido == 1) {
+                printf("%d\n", (int)valor_carta1);
+            } else {
+                printf("%.2f\n", valor_carta1);
+            }
+        }
+    }
+    
+    
+    printf("\n--- DICA ---\n");
+    printf("Para testar outros atributos, modifique a variável 'atributo_escolhido' no código:\n");
+    printf("1 - População | 2 - Área | 3 - PIB | 4 - Densidade | 5 - PIB per capita\n");
+    
+    return 0;
+}
