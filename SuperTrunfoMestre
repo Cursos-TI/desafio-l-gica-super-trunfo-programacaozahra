@@ -1,0 +1,299 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Estrutura para representar uma carta do Super Trunfo
+struct Carta {
+    char estado[3];
+    char codigo[10];
+    char cidade[50];
+    int populacao;
+    float area;
+    float pib;
+    int pontos_turisticos;
+    float densidade_populacional;
+    float pib_per_capita;
+};
+
+// Função para calcular densidade populacional e PIB per capita
+void calcular_metricas(struct Carta *carta) {
+    carta->densidade_populacional = carta->populacao / carta->area;
+    carta->pib_per_capita = carta->pib / carta->populacao;
+}
+
+// Função para exibir os dados de uma carta
+void exibir_carta(struct Carta c) {
+    printf(" %s (%s)\n", c.cidade, c.estado);
+    printf("   Populacao: %d hab | Area: %.2f km² | PIB: R$ %.2f bi\n", 
+           c.populacao, c.area, c.pib);
+    printf("   Pontos Turisticos: %d | Densidade: %.2f hab/km² | PIB per capita: R$ %.2f\n",
+           c.pontos_turisticos, c.densidade_populacional, c.pib_per_capita);
+}
+
+// Função para obter valor do atributo (usando operador ternário para código mais limpo)
+float obter_valor_atributo(struct Carta c, int atributo) {
+    return (atributo == 1) ? c.populacao :
+           (atributo == 2) ? c.area :
+           (atributo == 3) ? c.pib :
+           (atributo == 4) ? c.pontos_turisticos :
+           (atributo == 5) ? c.densidade_populacional :
+           c.pib_per_capita;
+}
+
+// Função para obter nome do atributo
+char* obter_nome_atributo(int atributo) {
+    return (atributo == 1) ? "Populacao" :
+           (atributo == 2) ? "Area" :
+           (atributo == 3) ? "PIB" :
+           (atributo == 4) ? "Pontos Turisticos" :
+           (atributo == 5) ? "Densidade Populacional" :
+           "PIB per capita";
+}
+
+// Função para exibir menu de atributos dinâmico (excluindo atributos já escolhidos)
+void exibir_menu_atributos_dinamico(int atributo1) {
+    printf("\n ESCOLHA O SEGUNDO ATRIBUTO (diferente do primeiro):\n");
+    for (int i = 1; i <= 6; i++) {
+        if (i != atributo1) {
+            printf("%d - %s\n", i, obter_nome_atributo(i));
+        }
+    }
+    printf("Digite sua escolha: ");
+}
+
+// Função para comparar um único atributo (retorna 1 se carta1 vencer, 2 se carta2 vencer, 0 empate)
+int comparar_atributo(struct Carta c1, struct Carta c2, int atributo) {
+    float v1 = obter_valor_atributo(c1, atributo);
+    float v2 = obter_valor_atributo(c2, atributo);
+    
+    // OPERADOR TERNÁRIO para determinar vencedor
+    if (atributo == 5) { // Densidade Populacional - menor vence
+        return (v1 < v2) ? 1 : (v1 > v2) ? 2 : 0;
+    } else { // Demais atributos - maior vence
+        return (v1 > v2) ? 1 : (v1 < v2) ? 2 : 0;
+    }
+}
+
+// Função principal de comparação com dois atributos
+void comparar_cartas_avancado(struct Carta c1, struct Carta c2, int atributo1, int atributo2) {
+    printf("\nCOMPARACAO AVANCADA: %s vs %s\n", c1.cidade, c2.cidade);
+    printf("============================================\n");
+    
+    // Comparação do primeiro atributo
+    printf("\n ATRIBUTO 1: %s\n", obter_nome_atributo(atributo1));
+    float v1_a1 = obter_valor_atributo(c1, atributo1);
+    float v2_a1 = obter_valor_atributo(c2, atributo1);
+    
+    printf("%s: ", c1.cidade);
+    if (atributo1 == 1 || atributo1 == 4) printf("%.0f\n", v1_a1);
+    else printf("%.2f\n", v1_a1);
+    
+    printf("%s: ", c2.cidade);
+    if (atributo1 == 1 || atributo1 == 4) printf("%.0f\n", v2_a1);
+    else printf("%.2f\n", v2_a1);
+    
+    int resultado_a1 = comparar_atributo(c1, c2, atributo1);
+    printf("Vencedor do Atributo 1: ");
+    if (resultado_a1 == 1) printf("%s (VITORIA)\n", c1.cidade);
+    else if (resultado_a1 == 2) printf("%s (VITORIA)\n", c2.cidade);
+    else printf("Empate!\n");
+    
+    // Comparação do segundo atributo
+    printf("\nATRIBUTO 2: %s\n", obter_nome_atributo(atributo2));
+    float v1_a2 = obter_valor_atributo(c1, atributo2);
+    float v2_a2 = obter_valor_atributo(c2, atributo2);
+    
+    printf("%s: ", c1.cidade);
+    if (atributo2 == 1 || atributo2 == 4) printf("%.0f\n", v1_a2);
+    else printf("%.2f\n", v1_a2);
+    
+    printf("%s: ", c2.cidade);
+    if (atributo2 == 1 || atributo2 == 4) printf("%.0f\n", v2_a2);
+    else printf("%.2f\n", v2_a2);
+    
+    int resultado_a2 = comparar_atributo(c1, c2, atributo2);
+    printf("Vencedor do Atributo 2: ");
+    if (resultado_a2 == 1) printf("%s (VITORIA)\n", c1.cidade);
+    else if (resultado_a2 == 2) printf("%s (VITORIA)\n", c2.cidade);
+    else printf("Empate!\n");
+    
+    // Cálculo da soma dos atributos (usando operador ternário para normalização)
+    float soma_c1 = ((atributo1 == 5) ? -v1_a1 : v1_a1) + ((atributo2 == 5) ? -v1_a2 : v1_a2);
+    float soma_c2 = ((atributo1 == 5) ? -v2_a1 : v2_a1) + ((atributo2 == 5) ? -v2_a2 : v2_a2);
+    
+    printf("\n SOMA DOS ATRIBUTOS (com regras especiais):\n");
+    printf("%s: %.2f pontos\n", c1.cidade, soma_c1);
+    printf("%s: %.2f pontos\n", c2.cidade, soma_c2);
+    
+    // Determinação do vencedor final
+    printf("\n RESULTADO FINAL:\n");
+    if (soma_c1 > soma_c2) {
+        printf(" %s VENCEU A RODADA!\n", c1.cidade);
+    } else if (soma_c1 < soma_c2) {
+        printf(" %s VENCEU A RODADA!\n", c2.cidade);
+    } else {
+        printf(" EMPATE! As cartas tem a mesma pontuacao total\n");
+    }
+    
+    printf("============================================\n");
+}
+
+// Função para exibir menu principal
+void exibir_menu_principal() {
+    printf("\n=== SUPER TRUNFO - NIVEL MESTRE ===\n");
+    printf("1 - Ver cartas disponiveis\n");
+    printf("2 - Comparacao avancada (2 atributos)\n");
+    printf("3 - Sair\n");
+    printf("Escolha uma opcao (1-3): ");
+}
+
+// Função para exibir menu de seleção de cartas
+void exibir_menu_cartas() {
+    printf("\n ESCOLHA AS CARTAS PARA COMPARAR:\n");
+    printf("1 - Sao Paulo (SP) vs Rio de Janeiro (RJ)\n");
+    printf("2 - Sao Paulo (SP) vs Belo Horizonte (MG)\n");
+    printf("3 - Rio de Janeiro (RJ) vs Belo Horizonte (MG)\n");
+    printf("4 - Sao Paulo (SP) vs Curitiba (PR)\n");
+    printf("5 - Rio de Janeiro (RJ) vs Curitiba (PR)\n");
+    printf("Escolha (1-5): ");
+}
+
+// Função para exibir menu de atributos completo
+void exibir_menu_atributos_completo() {
+    printf("\nESCOLHA O PRIMEIRO ATRIBUTO:\n");
+    printf("1 - Populacao\n");
+    printf("2 - Area\n");
+    printf("3 - PIB\n");
+    printf("4 - Pontos Turisticos\n");
+    printf("5 - Densidade Populacional\n");
+    printf("6 - PIB per capita\n");
+    printf("Digite sua escolha: ");
+}
+
+int main() {
+    struct Carta sp, rj, bh, ct;
+    int opcao, escolha_cartas, atributo1, atributo2;
+    
+    // São Paulo
+    strcpy(sp.estado, "SP");
+    strcpy(sp.codigo, "SP001");
+    strcpy(sp.cidade, "Sao Paulo");
+    sp.populacao = 12300000;
+    sp.area = 1521.11;
+    sp.pib = 699.28;
+    sp.pontos_turisticos = 150;
+    
+    // Rio de Janeiro
+    strcpy(rj.estado, "RJ");
+    strcpy(rj.codigo, "RJ001");
+    strcpy(rj.cidade, "Rio de Janeiro");
+    rj.populacao = 6748000;
+    rj.area = 1200.25;
+    rj.pib = 344.48;
+    rj.pontos_turisticos = 200;
+    
+    // Belo Horizonte
+    strcpy(bh.estado, "MG");
+    strcpy(bh.codigo, "MG001");
+    strcpy(bh.cidade, "Belo Horizonte");
+    bh.populacao = 2537000;
+    bh.area = 331.40;
+    bh.pib = 85.42;
+    bh.pontos_turisticos = 80;
+    
+    // Curitiba
+    strcpy(ct.estado, "PR");
+    strcpy(ct.codigo, "PR001");
+    strcpy(ct.cidade, "Curitiba");
+    ct.populacao = 1963000;
+    ct.area = 434.97;
+    ct.pib = 78.34;
+    ct.pontos_turisticos = 95;
+    
+    // Calcular métricas para todas as cartas
+    calcular_metricas(&sp);
+    calcular_metricas(&rj);
+    calcular_metricas(&bh);
+    calcular_metricas(&ct);
+    
+    // MENU INTERATIVO AVANÇADO
+    printf(" BEM-VINDO AO SUPER TRUNFO NIVEL MESTRE!\n");
+    printf(" Dica: Você comparara 2 atributos diferentes por rodada!\n");
+    
+    do {
+        exibir_menu_principal();
+        scanf("%d", &opcao);
+        
+        switch(opcao) {
+            case 1: // Ver cartas disponíveis
+                printf("\n CARTAS DISPONIVEIS:\n");
+                printf("=====================\n");
+                exibir_carta(sp);
+                printf("---------------------\n");
+                exibir_carta(rj);
+                printf("---------------------\n");
+                exibir_carta(bh);
+                printf("---------------------\n");
+                exibir_carta(ct);
+                printf("=====================\n");
+                break;
+                
+            case 2: // Comparação avançada com dois atributos
+                printf("\n MODO AVANCADO: COMPARACAO COM 2 ATRIBUTOS\n");
+                
+                // Menu de seleção de cartas
+                exibir_menu_cartas();
+                scanf("%d", &escolha_cartas);
+                
+                struct Carta carta1, carta2;
+                
+                // SWITCH para seleção de cartas
+                switch(escolha_cartas) {
+                    case 1: carta1 = sp; carta2 = rj; break;
+                    case 2: carta1 = sp; carta2 = bh; break;
+                    case 3: carta1 = rj; carta2 = bh; break;
+                    case 4: carta1 = sp; carta2 = ct; break;
+                    case 5: carta1 = rj; carta2 = ct; break;
+                    default:
+                        printf(" Opcao invalida! Usando Sao Paulo vs Rio de Janeiro.\n");
+                        carta1 = sp; carta2 = rj;
+                }
+                
+                // Menu do primeiro atributo
+                exibir_menu_atributos_completo();
+                scanf("%d", &atributo1);
+                
+                // Validar primeiro atributo
+                if (atributo1 < 1 || atributo1 > 6) {
+                    printf(" Atributo invalido! Usando Populacao como padrao.\n");
+                    atributo1 = 1;
+                }
+                
+                exibir_menu_atributos_dinamico(atributo1);
+                scanf("%d", &atributo2);
+                
+                if (atributo2 < 1 || atributo2 > 6 || atributo2 == atributo1) {
+                    printf("Atributo invalido ou repetido! ");
+                    printf("Escolhendo automaticamente um atributo diferente...\n");
+                    
+                    // Lógica para escolher atributo diferente automaticamente
+                    atributo2 = (atributo1 % 6) + 1;
+                    printf("Atributo 2 escolhido: %s\n", obter_nome_atributo(atributo2));
+                }
+                
+                comparar_cartas_avancado(carta1, carta2, atributo1, atributo2);
+                break;
+                
+            case 3: // Sair
+                printf("\nObrigado por jogar Super Trunfo Nivel Mestre!\n");
+                printf(" Espero que tenha se divertido e aprendido muito!\n");
+                break;
+                
+            default:
+                printf("Opcao invalida! Por favor, escolha 1, 2 ou 3.\n");
+        }
+        
+    } while (opcao != 3);
+    
+    return 0;
+}
